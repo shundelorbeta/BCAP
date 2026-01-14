@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
+import { FaBell } from 'react-icons/fa';
+import styles from './Notifications.module.css';
 
 const Notifications = () => {
   const { token } = useContext(AuthContext);
@@ -53,77 +55,29 @@ const Notifications = () => {
   const unreadCount = notifications.filter(n => !n.isRead).length;
 
   return (
-    <div style={{ position: 'relative', display: 'inline-block' }}>
-      <button
-        onClick={toggleDropdown}
-        style={{
-          background: 'none',
-          border: 'none',
-          cursor: 'pointer',
-          fontSize: '24px',
-          position: 'relative'
-        }}
-      >
-        🔔
-        {unreadCount > 0 && (
-          <span
-            style={{
-              position: 'absolute',
-              top: '-5px',
-              right: '-5px',
-              background: 'red',
-              color: 'white',
-              borderRadius: '50%',
-              padding: '2px 6px',
-              fontSize: '12px',
-              minWidth: '18px',
-              textAlign: 'center'
-            }}
-          >
-            {unreadCount}
-          </span>
-        )}
+    <div className={styles.notifications}>
+      <button className={styles.bellBtn} onClick={toggleDropdown}>
+        <FaBell />
+        {unreadCount > 0 && <span className={styles.badge}>{unreadCount}</span>}
       </button>
       {isOpen && (
-        <div
-          style={{
-            position: 'absolute',
-            top: '40px',
-            right: '0',
-            background: 'white',
-            border: '1px solid #ccc',
-            borderRadius: '8px',
-            boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-            width: '300px',
-            maxHeight: '400px',
-            overflowY: 'auto',
-            zIndex: 1000,
-            padding: '10px'
-          }}
-        >
+        <div className={styles.dropdown}>
           {loading ? (
-            <p>Loading...</p>
+            <p className={styles.loading}>Loading...</p>
           ) : notifications.length === 0 ? (
-            <p>No notifications</p>
+            <p className={styles.noNotifications}>No notifications</p>
           ) : (
             notifications.map(notif => (
               <div
                 key={notif._id}
+                className={`${styles.notificationItem} ${!notif.isRead ? styles.unread : ''}`}
                 onClick={() => markAsRead(notif._id)}
-                style={{
-                  padding: '10px',
-                  borderBottom: '1px solid #eee',
-                  cursor: 'pointer',
-                  background: notif.isRead ? 'white' : '#f0f8ff',
-                  borderRadius: '4px',
-                  marginBottom: '5px'
-                }}
               >
-                <p style={{ margin: '0 0 5px 0', fontWeight: 'bold' }}>
+                <p className={styles.title}>
                   {notif.relatedPost ? notif.relatedPost.caption : 'Post'}
                 </p>
-                <p style={{ margin: '0 0 5px 0' }}>{notif.message}</p>
-                <small style={{ color: '#666' }}>
+                <p className={styles.message}>{notif.message}</p>
+                <small className={styles.timestamp}>
                   {new Date(notif.createdAt).toLocaleString()}
                 </small>
               </div>
