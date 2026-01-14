@@ -9,14 +9,19 @@ const barangays = [
 const Feed = () => {
   const [posts, setPosts] = useState([]);
   const [formData, setFormData] = useState({ caption: '', barangay: '', images: null });
+  const [search, setSearch] = useState('');
+  const [barangayFilter, setBarangayFilter] = useState('');
   const { user } = useContext(AuthContext);
 
   useEffect(() => {
-    fetchPosts();
-  }, []);
+    fetchPosts(search, barangayFilter);
+  }, [search, barangayFilter]);
 
-  const fetchPosts = async () => {
-    const res = await axios.get('/api/posts');
+  const fetchPosts = async (searchParam = '', barangayParam = '') => {
+    const params = new URLSearchParams();
+    if (searchParam) params.append('search', searchParam);
+    if (barangayParam) params.append('barangay', barangayParam);
+    const res = await axios.get(`/api/posts?${params.toString()}`);
     setPosts(res.data);
   };
 
@@ -35,22 +40,32 @@ const Feed = () => {
       }
     }
     await axios.post('/api/posts', data);
-    fetchPosts();
+    fetchPosts(search, barangayFilter);
   };
 
   const likePost = async id => {
     await axios.put(`/api/posts/${id}/like`);
-    fetchPosts();
+    fetchPosts(search, barangayFilter);
   };
 
   const reportPost = async id => {
     await axios.post(`/api/posts/${id}/report`);
     alert('Post reported');
+    fetchPosts(search, barangayFilter);
   };
 
   return (
     <div>
       <h2>Bantayan Community Feed</h2>
+      <div>
+        <input type="text" placeholder="Search posts..." value={search} onChange={(e) => setSearch(e.target.value)} />
+        <button onClick={() => setSearch('')}>Clear Search</button>
+        <select value={barangayFilter} onChange={(e) => setBarangayFilter(e.target.value)}>
+          <option value="">All Barangays</option>
+          {barangays.map(b => <option key={b} value={b}>{b}</option>)}
+        </select>
+        <button onClick={() => setBarangayFilter('')}>Clear Filter</button>
+      </div>
       {user && (
         <form onSubmit={onSubmit}>
           <textarea name="caption" placeholder="Describe the issue" onChange={onChange} required />

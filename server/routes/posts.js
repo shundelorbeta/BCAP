@@ -16,7 +16,18 @@ const upload = multer({ storage });
 // Get all posts
 router.get('/', async (req, res) => {
   try {
-    const posts = await Post.find().populate('user', 'firstName lastName').populate('responses.admin', 'firstName lastName').sort({ createdAt: -1 });
+    const { search, barangay } = req.query;
+    let query = {};
+    if (search) {
+      query.$or = [
+        { caption: { $regex: search, $options: 'i' } },
+        { barangay: { $regex: search, $options: 'i' } }
+      ];
+    }
+    if (barangay) {
+      query.barangay = { $regex: barangay, $options: 'i' };
+    }
+    const posts = await Post.find(query).populate('user', 'firstName lastName').populate('responses.admin', 'firstName lastName').sort({ createdAt: -1 });
     res.json(posts);
   } catch (err) {
     res.status(500).json({ msg: 'Server error' });

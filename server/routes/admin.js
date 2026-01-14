@@ -3,6 +3,7 @@ const multer = require('multer');
 const path = require('path');
 const User = require('../models/User');
 const Post = require('../models/Post');
+const Notification = require('../models/Notification');
 const admin = require('../middleware/admin');
 
 const router = express.Router();
@@ -88,6 +89,16 @@ router.post('/posts/:id/respond', admin, upload.array('images', 5), async (req, 
     post.responses.push(response);
     if (statusUpdate) post.status = statusUpdate;
     await post.save();
+
+    // Create notification for the user
+    const notification = new Notification({
+      user: post.user,
+      message: 'Your post has been responded to by an admin.',
+      type: 'response',
+      relatedPost: post._id
+    });
+    await notification.save();
+
     res.json(post);
   } catch (err) {
     res.status(500).json({ msg: 'Server error' });
