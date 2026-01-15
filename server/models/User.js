@@ -12,9 +12,11 @@ const userSchema = new mongoose.Schema({
     barangay: { type: String, required: true }
   },
   password: { type: String, required: true },
+  bio: { type: String },
   role: { type: String, enum: ['user', 'admin', 'co-admin'], default: 'user' },
   assignedBarangays: [{ type: String }], // for co-admins
   verified: { type: Boolean, default: false }, // admin verification
+  pushSubscription: { type: Object },
   createdAt: { type: Date, default: Date.now }
 });
 

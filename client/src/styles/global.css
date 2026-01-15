@@ -120,4 +120,31 @@ body {
     .container {
         padding: 0 var(--spacing-sm);
     }
+
+    body {
+        font-size: 14px;
+    }
+
+    .btn {
+        padding: var(--spacing-xs) var(--spacing-sm);
+        font-size: 0.9rem;
+    }
+
+    .card {
+        padding: var(--spacing-md);
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 0 var(--spacing-xs);
+    }
+
+    body {
+        font-size: 13px;
+    }
+
+    .btn {
+        font-size: 0.8rem;
+    }
 }
